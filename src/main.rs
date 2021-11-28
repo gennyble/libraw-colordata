@@ -1,9 +1,54 @@
-use std::path::Path;
+use std::{
+    fs::{read_dir, DirEntry},
+    path::{Path, PathBuf},
+};
 
 use csv::WriterBuilder;
 
 fn main() {
-    make_colorspace_file("colorspaces.csv").unwrap();
+    let pixls_us_repo = std::env::args()
+        .skip(1)
+        .next()
+        .ok_or("Please pass the path of the raw.pixls.us repository as the first argument")
+        .unwrap();
+
+    if !PathBuf::from("colorspace.csv").exists() {
+        print!("Attempting to create colorspace csv... ");
+        match make_colorspace_file("colorspaces.csv") {
+            Err(e) => {
+                println!("Failed! Quitting...\n\t{}", e);
+                std::process::exit(1);
+            }
+            Ok(()) => {
+                println!("Success!");
+            }
+        }
+    } else {
+        println!("Colorspace csv exists, skipping creation.")
+    }
+
+    //let db_read = read_dir(pixls_us_repo).unwrap();
+    print_dir(0, pixls_us_repo);
+}
+
+pub fn print_dir<P: AsRef<Path>>(level: usize, path: P) {
+    let indents: String = std::iter::repeat("    ").take(level).collect();
+    let folder = '🗀';
+    let file = '📄';
+
+    for entry in read_dir(path.as_ref()).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+        let stem = path.file_stem().unwrap();
+        let ftype = entry.file_type().unwrap();
+
+        if ftype.is_dir() {
+            println!("{}{} {}", indents, folder, &stem.to_string_lossy());
+            print_dir(level + 1, &path);
+        } else {
+            println!("{}{} {}", indents, file, &stem.to_string_lossy());
+        }
+    }
 }
 
 // Make the "colorspaces.csv" file. The docs for ExifColorSpace on colordata_t
