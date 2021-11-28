@@ -1,0 +1,14 @@
+0,NotFound
+1,sRGB
+2,AdobeRGB
+3,WideGammutRGB
+4,ProPhotoRGB
+5,ICC
+6,Uncalibrated
+7,CameraLinearUniWB
+8,CameraLinear
+9,CameraGammaUniWB
+10,CameraGamma
+11,MonohcromeLinear
+12,MonochromeGamma
+255,Unknown
